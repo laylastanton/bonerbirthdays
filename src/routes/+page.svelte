@@ -6,7 +6,9 @@
 	import GradYearFilter from '$lib/components/GradYearFilter.svelte';
 	import BirthdayWidget from '$lib/components/BirthdayWidget.svelte';
 	import MemberForm from '$lib/components/MemberForm.svelte';
+	import LoginModal from '$lib/components/LoginModal.svelte';
 	import { Modal, Button } from '$lib/components/ui';
+	import { isAuthenticated, logout } from '$lib/stores/auth';
 
 	let members = $state<Member[]>([]);
 	let birthdays = $state<UpcomingBirthday[]>([]);
@@ -126,31 +128,55 @@
 		editingMember = member;
 		showEditModal = true;
 	}
+
+	function handleLogout() {
+		logout();
+	}
 </script>
 
-<div class="min-h-screen bg-gray-50">
-	<!-- Header -->
-	<header class="bg-white border-b border-gray-200 sticky top-0 z-10">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-			<div class="flex items-center justify-between">
-			<div>
-				<h1 class="text-3xl font-bold text-primary-600" style="font-family: 'Anton', sans-serif;">B1 BIRTHDAYS</h1>
-				<p class="text-sm text-gray-600 mt-1">Boners Living Community</p>
+{#if !$isAuthenticated}
+	<LoginModal />
+{:else}
+	<div class="min-h-screen bg-gray-50">
+		<!-- Header -->
+		<header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+				<div class="flex items-center justify-between">
+					<div>
+						<h1
+							class="text-3xl font-bold text-primary-600"
+							style="font-family: 'Anton', sans-serif;"
+						>
+							B1 BIRTHDAYS
+						</h1>
+						<p class="text-sm text-gray-600 mt-1">Boners Living Community</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<Button onclick={() => (showAddModal = true)}>
+							<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 4v16m8-8H4"
+								/>
+							</svg>
+							Add Member
+						</Button>
+						<Button variant="ghost" onclick={handleLogout} size="sm">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+								/>
+							</svg>
+						</Button>
+					</div>
+				</div>
 			</div>
-				<Button onclick={() => (showAddModal = true)}>
-					<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 4v16m8-8H4"
-						/>
-					</svg>
-					Add Member
-				</Button>
-			</div>
-		</div>
-	</header>
+		</header>
 
 	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		{#if isLoading}
@@ -188,6 +214,7 @@
 		{/if}
 	</main>
 </div>
+{/if}
 
 <!-- Add Member Modal -->
 <Modal open={showAddModal} onClose={() => (showAddModal = false)} title="Add New Member">
